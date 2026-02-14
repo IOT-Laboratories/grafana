@@ -260,6 +260,17 @@ export function getAlertingRoutes(cfg = config): RouteDescriptor[] {
       ),
     },
     {
+      path: '/alerting/notifications-history/',
+      component: cfg.featureToggles.alertingNotificationHistoryGlobal
+        ? importAlertingComponent(
+            () =>
+              import(
+                /* webpackChunkName: "NotificationsPage" */ 'app/features/alerting/unified/notifications/NotificationsPage'
+              )
+          )
+        : () => <Navigate replace to="/alerting" />,
+    },
+    {
       path: '/alerting/recently-deleted/',
       roles: () => ['Admin'],
       component: shouldAllowRecoveringDeletedRules()
@@ -288,13 +299,7 @@ export function getAlertingRoutes(cfg = config): RouteDescriptor[] {
     },
     {
       path: '/alerting/import-to-gma',
-      roles: evaluateAccess([
-        // For rules import
-        AccessControlAction.AlertingRuleCreate,
-        AccessControlAction.AlertingProvisioningSetStatus,
-        // For notifications import (contact points, policies, templates, time intervals)
-        AccessControlAction.AlertingNotificationsWrite,
-      ]),
+      roles: () => ['Admin'],
       component: config.featureToggles.alertingMigrationWizardUI
         ? importAlertingComponent(
             () =>
